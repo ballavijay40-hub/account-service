@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Acccount {
+public class Account {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -64,5 +64,10 @@ public class Acccount {
     public void onCreate(){
         this.createdAt=LocalDateTime.now();
         this.updatedAt= LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate(){
+        this.updatedAt=LocalDateTime.now();
     }
 }
