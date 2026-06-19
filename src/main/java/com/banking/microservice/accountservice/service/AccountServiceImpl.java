@@ -6,6 +6,7 @@ import com.banking.microservice.accountservice.dto.AccountResponseDto;
 import com.banking.microservice.accountservice.entity.Account;
 import com.banking.microservice.accountservice.enums.AccountStatus;
 import com.banking.microservice.accountservice.exception.AccountNotFoundException;
+import com.banking.microservice.accountservice.exception.InvalidAccountStatusException;
 import com.banking.microservice.accountservice.repository.AccountRepository;
 import com.banking.microservice.accountservice.util.AccountNumberGenerator;
 import lombok.RequiredArgsConstructor;
@@ -59,9 +60,15 @@ public class AccountServiceImpl implements AccountService {
     public void updateStatus(String accountNumber,String status){
         Account account=accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(()->new AccountNotFoundException("Account not found."));
+        try {
+            AccountStatus s = AccountStatus.valueOf(status);
+            account.setStatus(s);
+            accountRepository.save(account);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidAccountStatusException(e.toString());
+        }
 
-        account.setStatus(AccountStatus.valueOf(status));
-        accountRepository.save(account);
+
 
 
     }
