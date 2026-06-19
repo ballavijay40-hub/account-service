@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name="accounts",
         uniqueConstraints={
-        @UniqueConstraint(columnNames = "accountNumber")
+        @UniqueConstraint(columnNames = {"accountNumber","custometId"})
 },
         indexes = {
         @Index(name="idx_customer_id",columnList = "customerId")
@@ -32,7 +32,7 @@ public class Account {
     @Column(unique = true,nullable = false)
     private String accountNumber;
 
-
+    @Column(nullable = false)
     private Long customerId;
 
     @Enumerated(EnumType.STRING)
