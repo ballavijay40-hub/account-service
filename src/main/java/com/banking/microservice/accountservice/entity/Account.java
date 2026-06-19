@@ -43,9 +43,7 @@ public class Account {
     private BigDecimal balance=BigDecimal.ZERO;
 
 
-    @Builder.Default
-    @Column(nullable = false)
-    private String currency="INR";
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
