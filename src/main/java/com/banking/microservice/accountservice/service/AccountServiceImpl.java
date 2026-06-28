@@ -4,16 +4,22 @@ package com.banking.microservice.accountservice.service;
 import com.banking.microservice.accountservice.dto.AccountRequestDto;
 import com.banking.microservice.accountservice.dto.AccountResponseDto;
 import com.banking.microservice.accountservice.entity.Account;
-import com.banking.microservice.accountservice.enums.AccountStatus;
+
 import com.banking.microservice.accountservice.exception.AccountNotFoundException;
 import com.banking.microservice.accountservice.exception.InvalidAccountStatusException;
 import com.banking.microservice.accountservice.repository.AccountRepository;
 import com.banking.microservice.accountservice.util.AccountNumberGenerator;
+import com.banking.microservices.common.enums.AccountStatus;
+import com.banking.microservices.common.enums.TransactionStatus;
+import com.banking.microservices.common.events.request.TransactionRequestEvent;
+import com.banking.microservices.common.events.result.TransactionResultEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
@@ -82,6 +88,36 @@ public class AccountServiceImpl implements AccountService {
                 .balance(account.getBalance())
                 .status(account.getStatus())
                 .build();
+
+    }
+
+    @Override
+    public void processTransaction(TransactionRequestEvent transactionRequestEvent){
+//        TransactionResultEvent.TransactionResultEventBuilder transactionResultEventBuilder=TransactionResultEvent.builder()
+//                .referenceNumber(transactionRequestEvent.getReferenceNumber());
+
+        TransactionResultEvent transactionResultEvent=new TransactionResultEvent();
+        transactionResultEvent.setReferenceNumber(transactionRequestEvent.getReferenceNumber());
+
+
+        try{
+            switch (transactionRequestEvent.getTransactionType()){
+                case DEPOSIT -> processDepositTransaction(transactionRequestEvent);
+                case WITHDRAW -> processWithdrawTransaction(transactionRequestEvent);
+                case TRANSFER -> processTransferTransaction(transactionRequestEvent);
+                default -> throw new IllegalAccessException("Unsupported transaction type.");
+            }
+            transactionResultEvent.setStatus(TransactionStatus.SUCCESS);
+
+        }catch(Exception ex){
+            log.error("Transaction {} failed.",transactionRequestEvent.getReferenceNumber());
+            transactionResultEvent.setStatus(TransactionStatus.FAILED);
+            transactionResultEvent.setFailureReason(ex.getMessage());
+
+        }
+    }
+
+    public void processDepositTransaction(TransactionRequestEvent transactionRequestEvent){
 
     }
 

@@ -19,6 +19,8 @@ public class TransactionResultProducer {
     public void pubilsh(TransactionResultEvent event){
         kafkaTemplate.send(KafkaTopics.TRANSACTION_RESULTS,event.getReferenceNumber(),event);
 
+        log.info("published transaction {} result.",event.getReferenceNumber());
+
     }
 
 

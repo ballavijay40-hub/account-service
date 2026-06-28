@@ -1,7 +1,7 @@
 package com.banking.microservice.accountservice.dto;
 
-import com.banking.microservice.accountservice.enums.AccountType;
-import com.banking.microservice.accountservice.enums.AccountStatus;
+import com.banking.microservices.common.enums.AccountStatus;
+import com.banking.microservices.common.enums.AccountType;
 import lombok.*;
 
 import java.math.BigDecimal;

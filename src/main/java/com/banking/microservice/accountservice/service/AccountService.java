@@ -2,6 +2,7 @@ package com.banking.microservice.accountservice.service;
 
 import com.banking.microservice.accountservice.dto.AccountRequestDto;
 import com.banking.microservice.accountservice.dto.AccountResponseDto;
+import com.banking.microservices.common.events.request.TransactionRequestEvent;
 
 public interface AccountService {
 
@@ -13,4 +14,6 @@ public interface AccountService {
     AccountResponseDto getBalance(String accountNumber);
 
     void updateStatus(String accountNumber,String status);
+
+    void processTransaction(TransactionRequestEvent event);
 }
