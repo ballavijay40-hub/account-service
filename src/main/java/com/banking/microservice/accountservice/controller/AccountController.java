@@ -35,7 +35,7 @@ public class AccountController {
 
     @PutMapping("/{accountNumber}")
     public ResponseEntity<Void> updateStatus(@PathVariable String accountNumber,@RequestParam String status){
-        accountService.updateStatus(accountNumber,status)
+        accountService.updateStatus(accountNumber,status);
         return ResponseEntity.noContent().build();
     }
 }

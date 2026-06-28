@@ -1,7 +1,7 @@
 package com.banking.microservice.accountservice.dto;
 
 
-import com.banking.microservice.accountservice.enums.AccountType;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

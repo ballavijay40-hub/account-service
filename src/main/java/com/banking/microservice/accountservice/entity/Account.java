@@ -1,7 +1,8 @@
 package com.banking.microservice.accountservice.entity;
 
-import com.banking.microservice.accountservice.enums.AccountStatus;
-import com.banking.microservice.accountservice.enums.AccountType;
+
+import com.banking.microservices.common.enums.AccountStatus;
+import com.banking.microservices.common.enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 

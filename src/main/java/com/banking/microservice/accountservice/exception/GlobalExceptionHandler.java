@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-        s@ExceptionHandler(AccountNotFoundException.class)
+        @ExceptionHandler(AccountNotFoundException.class)
         public ResponseEntity<ErrorResponse> handleAccountNotFound(
                 AccountNotFoundException ex,
                 HttpServletRequest request
