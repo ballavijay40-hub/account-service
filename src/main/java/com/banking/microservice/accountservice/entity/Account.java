@@ -57,6 +57,9 @@ public class Account {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Version
+    private Long version;
+
 
 
     @PrePersist
