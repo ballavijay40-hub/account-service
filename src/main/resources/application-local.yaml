@@ -1,4 +1,9 @@
 spring:
+
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/bank_pdb
+    username: accounts_user
+    password: account_123
   kafka:
     topics:
       transaction-request: transaction-requests

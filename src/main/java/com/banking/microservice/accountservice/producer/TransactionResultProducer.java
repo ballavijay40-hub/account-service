@@ -16,7 +16,7 @@ public class TransactionResultProducer {
 
     private final KafkaTemplate<String, TransactionResultEvent> kafkaTemplate;
 
-    public void pubilsh(TransactionResultEvent event){
+    public void publish(TransactionResultEvent event){
         kafkaTemplate.send(KafkaTopics.TRANSACTION_RESULTS,event.getReferenceNumber(),event);
 
         log.info("published transaction {} result.",event.getReferenceNumber());
