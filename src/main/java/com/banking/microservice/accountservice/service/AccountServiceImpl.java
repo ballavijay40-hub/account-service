@@ -6,6 +6,7 @@ import com.banking.microservice.accountservice.dto.AccountResponseDto;
 import com.banking.microservice.accountservice.entity.Account;
 
 import com.banking.microservice.accountservice.exception.AccountNotFoundException;
+import com.banking.microservice.accountservice.exception.InsufficientBalanceException;
 import com.banking.microservice.accountservice.exception.InvalidAccountStatusException;
 import com.banking.microservice.accountservice.repository.AccountRepository;
 import com.banking.microservice.accountservice.util.AccountNumberGenerator;
@@ -16,6 +17,8 @@ import com.banking.microservices.common.events.result.TransactionResultEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -117,9 +120,126 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    public void processDepositTransaction(TransactionRequestEvent transactionRequestEvent){
+    private  void processDepositTransaction(TransactionRequestEvent transactionRequestEvent){
+        //load acc
+        Account account=getAccountForUpdate(transactionRequestEvent.getFromAccountNumber());
+        //validate acc
+        validateAccount(account);
+        //deposit
+        credit(account,transactionRequestEvent.getAmount());
+        //save to db
+        accountRepository.save(account);
+
+        //logs
+        log.info("Deposit complete for account {}.",account.getAccountNumber());
+
+
 
     }
+
+
+    private void processWithdrawTransaction(TransactionRequestEvent transactionRequestEvent){
+        //load acc
+        Account account=getAccountForUpdate(transactionRequestEvent.getFromAccountNumber());
+        //validadte
+        validateAccount(account);
+        //withdraw
+        debt(account,transactionRequestEvent.getAmount());
+        //save
+        accountRepository.save(account);
+
+        //log
+        log.info("withdraw completed for acc {}",account.getAccountNumber());
+    }
+
+    private void processTransferTransaction(TransactionRequestEvent transactionRequestEvent){
+        if(transactionRequestEvent.getFromAccountNumber().equals(transactionRequestEvent.getToAccountNumber())){
+            throw new IllegalArgumentException("Source and destination accounts cannot be the same.");
+        }
+
+        //load accs
+        Account fromAcc=getAccountForUpdate(transactionRequestEvent.getFromAccountNumber());
+        Account toAcc=getAccountForUpdate(transactionRequestEvent.getToAccountNumber());
+
+        //validate accs
+
+        validateAccount(fromAcc);
+        validateAccount(toAcc);
+
+        //now transfer
+        transfer(fromAcc,toAcc,transactionRequestEvent.getAmount());
+
+        accountRepository.save(fromAcc);
+        accountRepository.save(toAcc);
+
+        log.info("transaction completed from Account {} ,to Account {}.",fromAcc.getAccountNumber(),toAcc.getAccountNumber());
+
+
+    }
+
+//====================================================================
+
+    //helper methods
+
+    private void transfer(Account fromAcc,Account toAcc,BigDecimal amount){
+        //debit from fromAcc
+
+        debt(fromAcc,amount);
+
+        //credit to toACC
+
+        credit(toAcc,amount);
+
+
+    }
+
+
+
+
+
+
+
+    //load acc
+    private Account getAccountForUpdate(String accountNumber){
+        return accountRepository.findByAccountNumberForUpdate(accountNumber)
+                .orElseThrow(()->new AccountNotFoundException("Account  not found."));
+    }
+
+    //check acc status
+    private void validateAccount(Account account){
+        if(account.getStatus()!=AccountStatus.ACTIVE){
+            throw new InvalidAccountStatusException("Account is not active:"+account.getAccountNumber());
+        }
+
+    }
+
+    //debt
+    private void debt(Account account, BigDecimal amount){
+
+
+        if(amount.compareTo(BigDecimal.ZERO)<=0){
+            throw  new IllegalArgumentException("Amount must be greater than 0.");
+        }
+
+        if(account.getBalance().compareTo(amount)<0){
+            throw  new InsufficientBalanceException("Insufficient balance.");
+        }
+
+        account.setBalance(account.getBalance().subtract(amount));
+
+    }
+
+    //credit
+    private void credit(Account account,BigDecimal amount){
+        if(amount.compareTo(BigDecimal.ZERO)<=0){
+            throw new IllegalArgumentException("Amount must be greater than 0.");
+        }
+
+        account.setBalance(account.getBalance().add(amount));
+    }
+
+
+
 
 
 

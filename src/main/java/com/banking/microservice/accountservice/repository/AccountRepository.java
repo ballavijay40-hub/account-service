@@ -18,9 +18,11 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
             select a from Account a where account.accountNumber= :accountNumber
 
             """)
-    Optional<Account> findByAccountNumber(String AccountNumber);
+    Optional<Account> findByAccountNumberForUpdate(String AccountNumber);
 
     boolean existsByAccountNumber(String AccountNumber);
+
+    Optional<Account> findByAccountNumber(String accountNumber);
 
 
 
